@@ -1,0 +1,189 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Student {
+public:
+    string name;
+    int roll;
+    int marks[5];
+    double total;
+    double percentage;
+    char grade;
+
+    Student() {
+        total = 0;
+        percentage = 0;
+        grade = 'F';
+    }
+
+    void input() {
+        cin.ignore();
+        cout << "\nEnter student's name: ";
+        getline(cin, name);
+        cout << "Enter roll number: ";
+        cin >> roll;
+
+        total = 0;
+        cout << "Enter marks in 5 subjects (out of 50): ";
+        for (int i = 0; i < 5; ++i) {
+            do {
+                cin >> marks[i];
+                if (marks[i] < 0 || marks[i] > 50)
+                    cout << "Invalid! Enter mark between 0 and 50: ";
+            } while (marks[i] < 0 || marks[i] > 50);
+            total += marks[i];
+        }
+
+        percentage = (total / 250.0) * 100;
+        assignGrade();
+    }
+
+    void assignGrade() {
+        if (percentage >= 90) grade = 'A';
+        else if (percentage >= 75) grade = 'B';
+        else if (percentage >= 60) grade = 'C';
+        else if (percentage >= 50) grade = 'D';
+        else grade = 'F';
+    }
+
+    void display() {
+        cout << "\nName: " << name;
+        cout << "\nRoll No: " << roll;
+        cout << "\nTotal Marks: " << total;
+        cout << "\nPercentage: " << percentage << "%";
+        cout << "\nGrade: " << grade << endl;
+        if (grade == 'F') {
+            cout << "Status: Failed - Fine of 500 applicable." << endl;
+        }
+    }
+};
+
+// Find the index of the top student
+int findTopper(Student students[], int n) {
+    int topIndex = 0;
+    for (int i = 1; i < n; ++i) {
+        if (students[i].total > students[topIndex].total) {
+            topIndex = i;
+        }
+    }
+    return topIndex;
+}
+
+// List students who failed
+void listFailures(Student students[], int n) {
+    cout << "\nStudents who failed and must pay a fine of 500:\n";
+    bool found = false;
+    for (int i = 0; i < n; ++i) {
+        if (students[i].grade == 'F') {
+            cout << students[i].name << " (Roll: " << students[i].roll << ")\n";
+            found = true;
+        }
+    }
+    if (!found) {
+        cout << "No student has failed.\n";
+    }
+}
+
+// Search student by roll number
+void searchByRoll(Student students[], int n, int rollNo) {
+    bool found = false;
+    for (int i = 0; i < n; ++i) {
+        if (students[i].roll == rollNo) {
+            cout << "\nStudent found:\n";
+            students[i].display();
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        cout << "Student with Roll No " << rollNo << " not found.\n";
+    }
+}
+
+int main() {
+    int n;
+    cout << "Enter number of students (max 100): ";
+    cin >> n;
+
+    if (n <= 0 || n > 100) {
+        cout << "Invalid number of students.\n";
+        return 0;
+    }
+
+    Student students[100]; 
+
+    int choice;
+    bool dataEntered = false;
+
+    do {
+        cout << "\n---Student Management Menu ---\n";
+        cout << "1. Enter Student Data\n";
+        cout << "2. Display All Students\n";
+        cout << "3. Show Topper\n";
+        cout << "4. List Failing Students\n";
+        cout << "5. Search by Roll Number\n";
+        cout << "6. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            for (int i = 0; i < n; ++i) {
+                cout << "\n--- Enter details for student " << i + 1 << " ---\n";
+                students[i].input();
+            }
+            dataEntered = true;
+            break;
+
+        case 2:
+            if (dataEntered) {
+                for (int i = 0; i < n; ++i) {
+                    students[i].display();
+                }
+            } else {
+                cout << "No student data entered yet.\n";
+            }
+            break;
+
+        case 3:
+            if (dataEntered) {
+                int topper = findTopper(students, n);
+                cout << "\nTopper of the class:\n";
+                students[topper].display();
+            } else {
+                cout << "Enter student data first.\n";
+            }
+            break;
+
+        case 4:
+            if (dataEntered) {
+                listFailures(students, n);
+            } else {
+                cout << "Enter student data first.\n";
+            }
+            break;
+
+        case 5:
+            if (dataEntered) {
+                int rollSearch;
+                cout << "Enter roll number to search: ";
+                cin >> rollSearch;
+                searchByRoll(students, n, rollSearch);
+            } else {
+                cout << "Enter student data first.\n";
+            }
+            break;
+
+        case 6:
+            cout << "Exiting the program. Goodbye!\n";
+            break;
+
+        default:
+            cout << "Invalid choice. Try again.\n";
+        }
+
+    } while (choice != 6);
+
+    return 0;
+}
